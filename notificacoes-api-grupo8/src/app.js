@@ -2,6 +2,10 @@ const express = require("express");
 const app = express();
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
+const logger = require(".middlewares/logger");
+
+// Middleware
+app.use(logger);
 
 
 // Middleware para ler JSON no body das requisições
