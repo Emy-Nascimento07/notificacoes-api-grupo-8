@@ -5,21 +5,7 @@ let inscricoes = [];
 let proximoId = 1;
 
 // Criar uma nova inscrição
-function criar(eventoId, participanteId) {
-
-    // Verificar se o evento existe
-    const evento = EventoModel.buscarPorId(eventoId);
-    if (!evento) return { erro: "Evento não encontrado" };
-
-    // Verificar se o participante existe
-    const participante = ParticipanteModel.buscarPorId(participanteId);
-    if (!participante) return { erro: "Participante não encontrado" };
-
-    // Verificar se já está inscrito
-    const jaInscrito = inscricoes.find(
-        (i) => i.eventoId === eventoId && i.participanteId === participanteId,
-    );
-    if (jaInscrito) return { erro: "Participante já inscrito neste evento" };
+function criar({eventoId, participanteId}) {
 
     const novaInscricao = {
         id: proximoId,

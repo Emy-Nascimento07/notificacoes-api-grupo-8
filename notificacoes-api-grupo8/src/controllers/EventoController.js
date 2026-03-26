@@ -1,75 +1,89 @@
 const EventoModel = require("../models/EventoModel");
+const { NotFoundError, ValidationError } = require("../errors/AppError");
 
-// GET
-function index(req, res) {
-    const eventos = EventoModel.listarTodos();
-    res.json(eventos);
+// GET (buscar tudo) - Requisição refatorada, usando next, try e catch
+function index(req, res, next) {
+    try {
+        const eventos = EventoModel.listarTodos();
+        res.json(eventos);
+    } catch (erro) {
+        next(erro);
+    }
 }
 
-// GET - Buscar por ID
-function show(req, res) {
-    const id = parseInt(req.params.id);
-    const evento = EventoModel.buscarPorId(id);
-
-    if (!evento) {
-        return res.status(404).json({ erro: "Evento não encontrado" });
+// GET (buscar por ID) - Requisição refatorada, usando next, try e catch
+function show(req, res, next) {
+    try {
+        const id = parseInt(req.params.id);
+        const evento = EventoModel.buscarPorId(id)
+        if (!evento) {
+            throw new NotFoundError("Evento");
+        }
+        res.json(evento);
+    } catch (erro) {
+        next(erro)
     }
-
-    res.json(evento);
 }
 
-// POST - Criar
-function store(req, res) {
-    const { nome, descricao, data, local, capacidade } = req.body;
+// POST (criar) - Requisição refatorada, usando next, try e catch
+function store(req, res, next) {
+    try {
+        const { nome, descricao, data, local, capacidade } = req.body;
 
-    // Validação melhorada
-    // Nome.trim => remove espaços em branco no início e no final, garantindo que o nome não seja apenas espaços.
-    if (!nome || nome.trim() === "") {
-        return res.status(400).json({ erro: "Nome inválido. Deve conter pelo menos uma letra." });
+        // Validação melhorada
+        // Nome.trim => remove espaços em branco no início e no final, garantindo que o nome não seja apenas espaços.
+        if (!nome || nome.trim() === "" || !data) {
+            throw new ValidationError("Nome e data são obrigatórios");
+        }
+
+        if (capacidade !== undefined && (capacidade < 0)) {
+            throw new ValidationError("Capacidade deve ser um número válido");
+        }
+
+        const novoEvento = EventoModel.criar({
+            nome,
+            descricao,
+            data,
+            local,
+            capacidade,
+        });
+
+        res.status(201).json(novoEvento);
+    } catch (erro) {
+        next(erro)
     }
-
-    if (!data) {
-        return res.status(400).json({ erro: "Data é obrigatória." });
-    }
-
-    if (capacidade !== undefined && (capacidade < 0)) {
-        return res.status(400).json({ erro: "Capacidade deve ser um número não-negativo." });
-    }
-
-    const novoEvento = EventoModel.criar({
-        nome,
-        descricao,
-        data,
-        local,
-        capacidade,
-    });
-
-    res.status(201).json(novoEvento);
 }
 
 // PUT - Atualizar
-function update(req, res) {
-    const id = parseInt(req.params.id);
-    const eventoAtualizado = EventoModel.atualizar(id, req.body);
+function update(req, res, next) {
+    try {
+        const id = parseInt(req.params.id);
+        const eventoAtualizado = EventoModel.atualizar(id, req.body);
 
-    if (!eventoAtualizado) {
-        return res.status(404).json({ erro: "Evento não encontrado" });
+        if (!eventoAtualizado) {
+            throw new NotFoundError("Evento");
+        }
 
+        res.json(eventoAtualizado);
+    } catch (erro) {
+        next(erro);
     }
-
-    res.json(eventoAtualizado);
 }
 
 // DELETE - Deletar
-function destroy(req, res) {
-    const id = parseInt(req.params.id);
-    const deletado = EventoModel.deletar(id);
+function destroy(req, res, next) {
+    try {
+        const id = parseInt(req.params.id);
+        const deletado = EventoModel.deletar(id);
 
-    if (!deletado) {
-        return res.status(404).json({ erro: "Evento não encontrado" });
+        if (!deletado) {
+            throw new NotFoundError("Evento");
+        }
+
+        res.status(204).send();
+    } catch (erro) {
+        next(erro);
     }
-
-    res.status(204).send();
 }
 
 module.exports = {

@@ -1,75 +1,95 @@
+//Modifica para que os erros sejam lançados diretamente
 const InscricaoModel = require("../models/InscricaoModel");
+const { NotFoundError, ValidationError } = require("../errors/AppError");
 
 // POST /inscricoes — criar uma inscrição
-function store(req, res) {
+function store(req, res, next) {
+  try {
     const { eventoId, participanteId } = req.body || {};
 
     if (!eventoId || !participanteId) {
-        return res
-            .status(400)
-            .json({ erro: "eventoId e participanteId são obrigatórios" });
+      throw new ValidationError(
+        "ID do evento e do participante são obrigatórios",
+      );
     }
 
-    const resultado = InscricaoModel.criar(
-        parseInt(eventoId),
-        parseInt(participanteId),
-    );
+    const novaInscricao = InscricaoModel.criar({
+      eventoId,
+      participanteId,
+    });
 
-    // Se o resultado tem a propriedade "erro", algo deu errado
-    if (resultado.erro) {
-        return res.status(400).json(resultado);
-    }
-
-    res.status(201).json(resultado);
+    res.status(201).json(novaInscricao);
+  } catch (erro) {
+    next(erro);
+  }
 }
 
-// GET /inscricoes/ — listar todas as inscrições
-function index(req, res) {
+// GET (buscar tudo) - Requisição refatorada, usando next, try e catch
+function index(req, res, next) {
+  try {
     const inscricoes = InscricaoModel.listarTodas();
+
+    if (inscricoes.length === 0) {
+      throw new NotFoundError("Não existem inscrições");
+    }
     res.json(inscricoes);
+  } catch (erro) {
+    next(erro);
+  }
 }
 
-// GET /inscricoes/evento/:eventoId - Listar inscricoes de um evento
-function listarPorEvento(req, res) {
+// GET (buscar por ID) - Requisição refatorada, usando next, try e catch
+function listarPorEvento(req, res, next) {
+  try {
     const eventoId = parseInt(req.params.eventoId);
     const inscricoes = InscricaoModel.listarPorEvento(eventoId);
 
     if (!inscricoes || inscricoes.length === 0) {
-        return res.status(404).json({ erro: "Nenhuma inscrição encontrada para esse evento" });
+      throw new NotFoundError("Nenhuma inscrição para esse evento encontrada");
     }
 
     res.json(inscricoes);
+  } catch (erro) {
+    next(erro);
+  }
 }
 
-// PATCH /inscricoes/:id/cancelar — cancelar uma inscrição
-function cancelar(req, res) {
+// PATCH (atualizar parcialmente) -  Requisição refatorada, usando next, try e catch
+function cancelar(req, res, next) {
+  try {
     const id = parseInt(req.params.id);
-
     const cancelado = InscricaoModel.cancelar(id);
 
     if (!cancelado) {
-        return res.status(404).json({ erro: "Não foi possível cancelar a inscrição" });
+      throw new NotFoundError("Inscrição");
     }
 
-    res.status(200).json(cancelado);
+    res.json(cancelado);
+  } catch (erro) {
+    next(erro);
+  }
 }
 
-// GET /inscricoes/:id/detalhes - buscar detalhes de uma inscrição
-function detalhes(req, res) {
+// GET (buscar detalhes de uma inscrição) - Requisição refatorada, usando next, try e catch
+function detalhes(req, res, next) {
+  try {
     const id = parseInt(req.params.id);
-
     const detalhes = InscricaoModel.buscarComDetalhes(id);
+
     if (!detalhes) {
-        return res.status(404).json({ erro: "Inscrição não encontrada" });
+      throw new NotFoundError("Inscrições");
     }
 
     res.json(detalhes);
+  } catch (erro) {
+    next(erro);
+  }
 }
 
 module.exports = {
-    store,
-    index,
-    listarPorEvento,
-    cancelar,
-    detalhes
+  store,
+  index,
+  listarPorEvento,
+  cancelar,
+  detalhes,
 };
