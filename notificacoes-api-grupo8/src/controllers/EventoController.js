@@ -1,3 +1,9 @@
+const {
+    isRequired,
+    isPositiveInteger,
+    minLength,
+    validar,
+} = require("../helpers/validators");
 const EventoModel = require("../models/EventoModel");
 const { NotFoundError, ValidationError } = require("../errors/AppError");
 
@@ -15,13 +21,13 @@ function index(req, res, next) {
 function show(req, res, next) {
     try {
         const id = parseInt(req.params.id);
-        const evento = EventoModel.buscarPorId(id)
+        const evento = EventoModel.buscarPorId(id);
         if (!evento) {
             throw new NotFoundError("Evento");
         }
         res.json(evento);
     } catch (erro) {
-        next(erro)
+        next(erro);
     }
 }
 
@@ -30,15 +36,27 @@ function store(req, res, next) {
     try {
         const { nome, descricao, data, local, capacidade } = req.body;
 
-        // Validação melhorada
-        // Nome.trim => remove espaços em branco no início e no final, garantindo que o nome não seja apenas espaços.
-        if (!nome || nome.trim() === "" || !data) {
-            throw new ValidationError("Nome e data são obrigatórios");
+        //Valida os dados de entrada 
+        const erros = validar([
+            isRequired(nome, "Nome"),
+            isRequired(data, "Data"),
+            minLength(nome, 3, "Nome"),
+            isPositiveInteger(capacidade, "Capacidade"),
+        ]);
+
+        if (erros) {
+            throw new ValidationError(erros.join("; "));
         }
 
-        if (capacidade !== undefined && (capacidade < 0)) {
-            throw new ValidationError("Capacidade deve ser um número válido");
-        }
+        // // Validação melhorada (inutilizada)
+        // // Nome.trim => remove espaços em branco no início e no final, garantindo que o nome não seja apenas espaços.
+        // if (!nome || nome.trim() === "" || !data) {
+        //     throw new ValidationError("Nome e data são obrigatórios");
+        // }
+
+        // if (capacidade !== undefined && (capacidade < 0)) {
+        //     throw new ValidationError("Capacidade deve ser um número válido");
+        // }
 
         const novoEvento = EventoModel.criar({
             nome,
@@ -50,7 +68,7 @@ function store(req, res, next) {
 
         res.status(201).json(novoEvento);
     } catch (erro) {
-        next(erro)
+        next(erro);
     }
 }
 
@@ -58,8 +76,15 @@ function store(req, res, next) {
 function update(req, res, next) {
     try {
         const id = parseInt(req.params.id);
+        const { nome, capacidade } = req.body;
+        const erros = validar([
+            minLength(nome, 3, "Nome"),
+            isPositiveInteger(capacidade, "Capacidade"),
+        ]);
+        if (erros) {
+            throw new ValidationError(erros.join("; "));
+        }
         const eventoAtualizado = EventoModel.atualizar(id, req.body);
-
         if (!eventoAtualizado) {
             throw new NotFoundError("Evento");
         }

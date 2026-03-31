@@ -1,5 +1,6 @@
 const ParticipanteModel = require("../models/ParticipanteModel");
 const { NotFoundError, ValidationError } = require("../errors/AppError");
+const { isRequired, isEmail, minLength, validar } = require("../helpers/validators");
 
 // GET (buscar tudo) - Requisição refatorada, usando next, try e catch
 function index(req, res, next) {
@@ -29,6 +30,18 @@ function show(req, res, next) {
 function store(req, res, next) {
     try {
         const { nome, email } = req.body;
+
+        //O nome é obrigatótio e deve ter pelo menos 2 caracteres
+        const erros = validar([
+            isRequired(nome, "Nome"),
+            isRequired(email, "Email"),
+            minLength(nome, 2, "Nome"),
+            isEmail(email, "Email"),
+        ])
+
+        if (erros) {
+            throw new ValidationError(erros.join(", "));
+        }
 
         if (!nome || nome.trim() === "" || email.trim() === "") {
             throw new ValidationError("Nome e email são obrigatórios");
