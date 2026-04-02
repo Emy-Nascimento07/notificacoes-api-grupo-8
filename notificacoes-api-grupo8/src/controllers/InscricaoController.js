@@ -1,23 +1,12 @@
 //Modifica para que os erros sejam lançados diretamente
-const InscricaoModel = require("../models/InscricaoModel");
+const InscricaoService = require("../services/InscricaoService");
 const { NotFoundError, ValidationError } = require("../errors/AppError");
 
 // POST /inscricoes — criar uma inscrição
 function store(req, res, next) {
   try {
-    const { eventoId, participanteId } = req.body || {};
-
-    if (!eventoId || !participanteId) {
-      throw new ValidationError(
-        "ID do evento e do participante são obrigatórios",
-      );
-    }
-
-    const novaInscricao = InscricaoModel.criar({
-      eventoId,
-      participanteId,
-    });
-
+    const { eventoId, participanteId } = req.body;
+    const novaInscricao = InscricaoService.criar(eventoId, participanteId);
     res.status(201).json(novaInscricao);
   } catch (erro) {
     next(erro);
@@ -27,11 +16,7 @@ function store(req, res, next) {
 // GET (buscar tudo) - Requisição refatorada, usando next, try e catch
 function index(req, res, next) {
   try {
-    const inscricoes = InscricaoModel.listarTodas();
-
-    if (inscricoes.length === 0) {
-      throw new NotFoundError("Não existem inscrições");
-    }
+    const inscricoes = InscricaoService.listarTodas();
     res.json(inscricoes);
   } catch (erro) {
     next(erro);
@@ -42,11 +27,7 @@ function index(req, res, next) {
 function listarPorEvento(req, res, next) {
   try {
     const eventoId = parseInt(req.params.eventoId);
-    const inscricoes = InscricaoModel.listarPorEvento(eventoId);
-
-    if (!inscricoes || inscricoes.length === 0) {
-      throw new NotFoundError("Nenhuma inscrição para esse evento encontrada");
-    }
+    const inscricoes = InscricaoService.listarPorEvento(eventoId);
 
     res.json(inscricoes);
   } catch (erro) {
@@ -58,13 +39,9 @@ function listarPorEvento(req, res, next) {
 function cancelar(req, res, next) {
   try {
     const id = parseInt(req.params.id);
-    const cancelado = InscricaoModel.cancelar(id);
+    InscricaoService.cancelar(id);
 
-    if (!cancelado) {
-      throw new NotFoundError("Inscrição");
-    }
-
-    res.json(cancelado);
+    res.status(204).send();
   } catch (erro) {
     next(erro);
   }
@@ -74,11 +51,7 @@ function cancelar(req, res, next) {
 function detalhes(req, res, next) {
   try {
     const id = parseInt(req.params.id);
-    const detalhes = InscricaoModel.buscarComDetalhes(id);
-
-    if (!detalhes) {
-      throw new NotFoundError("Inscrições");
-    }
+    const detalhes = InscricaoService.buscarComDetalhes(id);
 
     res.json(detalhes);
   } catch (erro) {

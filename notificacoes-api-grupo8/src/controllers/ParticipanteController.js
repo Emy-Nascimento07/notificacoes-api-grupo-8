@@ -1,11 +1,11 @@
-const ParticipanteModel = require("../models/ParticipanteModel");
+const ParticipanteService = require("../services/ParticipanteService");
 const { NotFoundError, ValidationError } = require("../errors/AppError");
 const { isRequired, isEmail, minLength, validar } = require("../helpers/validators");
 
 // GET (buscar tudo) - Requisição refatorada, usando next, try e catch
 function index(req, res, next) {
     try {
-        const participantes = ParticipanteModel.listarTodos();
+        const participantes = ParticipanteService.listarTodos();
         res.json(participantes);
     } catch (erro) {
         next(erro);
@@ -16,10 +16,7 @@ function index(req, res, next) {
 function show(req, res, next) {
     try {
         const id = parseInt(req.params.id);
-        const participante = ParticipanteModel.buscarPorId(id);
-        if (!participante) {
-            throw new NotFoundError("Participante")
-        }
+        const participante = ParticipanteService.buscarPorId(id);
         res.json(participante);
     } catch (erro) {
         next(erro)
@@ -30,26 +27,9 @@ function show(req, res, next) {
 function store(req, res, next) {
     try {
         const { nome, email } = req.body;
-
-        //O nome é obrigatótio e deve ter pelo menos 2 caracteres
-        const erros = validar([
-            isRequired(nome, "Nome"),
-            isRequired(email, "Email"),
-            minLength(nome, 2, "Nome"),
-            isEmail(email, "Email"),
-        ])
-
-        if (erros) {
-            throw new ValidationError(erros.join(", "));
-        }
-
-        if (!nome || nome.trim() === "" || email.trim() === "") {
-            throw new ValidationError("Nome e email são obrigatórios");
-        }
-
-        const novoParticipante = ParticipanteModel.criar({
-            nome,
-            email,
+        const novoParticipante = ParticipanteService.criar({
+        nome,
+        email,
         });
 
         res.status(201).json(novoParticipante);
@@ -62,12 +42,7 @@ function store(req, res, next) {
 function update(req, res, next) {
     try {
         const id = parseInt(req.params.id);
-        const participanteAtualizado = ParticipanteModel.atualizar(id, req.body);
-
-        if (!participanteAtualizado) {
-            throw new NotFoundError("Participante");
-
-        }
+        const participanteAtualizado = ParticipanteService.atualizar(id, req.body);
         res.json(participanteAtualizado);
     } catch (erro) {
         next(erro)
@@ -80,12 +55,8 @@ function update(req, res, next) {
 function destroy(req, res, next) {
     try {
         const id = parseInt(req.params.id);
-        const deletado = ParticipanteModel.deletar(id);
-
-        if (!deletado) {
-            throw new NotFoundError("Participante")
-        }
-
+        const deletado = ParticipanteService.deletar(id);
+        
         res.status(204).send();
     } catch (erro) {
         next(erro)
