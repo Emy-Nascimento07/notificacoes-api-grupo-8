@@ -1,3 +1,4 @@
+// Módulos internos do projeto
 const InscricaoModel = require("../models/InscricaoModel");
 const EventoModel = require("../models/EventoModel");
 const ParticipanteModel = require("../models/ParticipanteModel");

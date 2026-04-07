@@ -68,11 +68,13 @@ npm start
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
-
-- **Node.js**
-- **Express.js**
-- **Swagger** (`swagger-jsdoc` + `swagger-ui-express`)
+## ️ Tecnologias
+- Node.js
+- Express.js
+- Swagger (swagger-jsdoc + swagger-ui-express)
+- Dotenv (variáveis de ambiente)
+- Nodemon (desenvolvimento)
+- CORS
 
 ---
 
@@ -80,12 +82,24 @@ npm start
 
 ```text
 src/
-├── models/        → Dados e regras de negócio
-├── controllers/   → Lógica das requisições
-├── routes/        → Mapeamento de URLs
-├── swagger.js     → Configuração do Swagger
-├── app.js         → Configuração do Express
-└── server.js      → Inicialização do servidor
+├── controllers/ → Recebe requisições, retorna respostas
+├── services/ → Lógica de negócio e validações
+├── models/ → Acesso e manipulação de dados
+├── routes/ → Mapeamento de URLs
+├── middlewares/ → Funções intermediárias (log, erros, CORS)
+├── errors/ → Classes de erro customizadas
+├── helpers/ → Funções auxiliares (validação, etc.)
+├── swagger.js → Configuração da documentação
+├── app.js → Configuração do Express
+└── server.js → Inicialização do servidor
 ```
+
+---
+
+## 🔧 Scripts
+| Comando | Descrição |
+|---------|-----------|
+| `npm start` | Inicia o servidor (produção) |
+| `npm run dev` | Inicia com Nodemon (desenvolvimento) |
 
 ---

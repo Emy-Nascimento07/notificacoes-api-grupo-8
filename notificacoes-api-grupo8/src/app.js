@@ -1,3 +1,4 @@
+// Dependências externas do projeto
 const express = require("express");
 const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
@@ -22,6 +23,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // ============================================
 // ROTAS
 // ============================================
+// Módulos internos do projeto
 const eventoRoutes = require("./routes/eventoRoutes");
 const participanteRoutes = require("./routes/participanteRoutes");
 const inscricaoRoutes = require("./routes/inscricaoRoutes");

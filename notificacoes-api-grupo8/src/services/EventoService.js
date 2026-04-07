@@ -1,3 +1,4 @@
+// Módulos internos do projeto
 const EventoModel = require("../models/EventoModel");
 const { NotFoundError, ValidationError } = require("../errors/AppError");
 const {
@@ -20,9 +21,9 @@ function buscarPorId(id) {
 
     return evento;
 }
+
 function criar(dados) {
     const { nome, descricao, data, local, capacidade } = dados;
-    
     
     // Validação
     const erros = validar([
@@ -31,7 +32,6 @@ function criar(dados) {
         minLength(nome, 3, "Nome"),
         isPositiveInteger(capacidade, "Capacidade"),
     ]);
-
 
     if (erros) {
         throw new ValidationError(erros.join("; "));
@@ -42,8 +42,7 @@ function criar(dados) {
 
 function atualizar(id, dados) {
     const { nome, capacidade } = dados;
-    
-    
+      
     // Validações (campos opcionais no update)
     const erros = validar([
         minLength(nome, 3, "Nome"),
@@ -53,7 +52,6 @@ function atualizar(id, dados) {
     if (erros) {
         throw new ValidationError(erros.join("; "));
     }
-
 
     const eventoAtualizado = EventoModel.atualizar(id, dados);
     if (!eventoAtualizado) {
@@ -71,7 +69,6 @@ function deletar(id) {
         throw new NotFoundError("Evento");
     }
 
-    
     return true;
 }
 

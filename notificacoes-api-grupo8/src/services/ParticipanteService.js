@@ -1,3 +1,4 @@
+// Módulos internos do projeto
 const ParticipanteModel = require('../models/ParticipanteModel');
 const {NotFoundError, ValidationError} = require('../errors/AppError');
 const {

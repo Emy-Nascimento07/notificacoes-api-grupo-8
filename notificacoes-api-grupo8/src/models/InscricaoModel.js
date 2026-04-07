@@ -1,8 +1,28 @@
+// Módulos internos do projeto
 const EventoModel = require("./EventoModel");
 const ParticipanteModel = require("./ParticipanteModel");
 
-let inscricoes = [];
-let proximoId = 1;
+// Banco de dados temporário - array em memória
+
+let inscricoes = [
+    {
+        id: 1,
+        eventoId: 1,
+        participanteId: 1,
+        dataInscricao: "2025-08-15",
+        status: "confirmada",
+    },
+    {
+        id: 2,
+        eventoId: 1,
+        participanteId: 2,
+        dataInscricao: "2025-08-19",
+        status: "confirmada",
+    },
+];
+
+// Variável para controlar o ID
+let proximoId = 3;
 
 // Criar uma nova inscrição
 // InscricaoModel.criar() simplificado:
