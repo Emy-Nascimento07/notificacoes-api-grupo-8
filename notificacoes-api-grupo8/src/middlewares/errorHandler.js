@@ -7,14 +7,22 @@ function errorHandler(err, req, res, next) {
 // Log do erro no console (para o desenvolvedor)
 console.error(`[ERRO] ${err.name}: $[mensagem]`);
 
-// Resposta padronizada para o cliente
-res.status(statusCode).json({
+const resposta = {
     erro: {
         tipo: err.name || "Error",
         mensagem: mensagem,
-        statusCode: statusCode
-        },
-    });
+        statusCode: statusCode,
+    },
+};
+
+if (process.env.NODE_ENV === "development") {
+    resposta.stack = err.stack;
+};
+
+
+// Resposta padronizada para o cliente
+res.status(statusCode).json(resposta);
+
 }
 
 module.exports = errorHandler;
