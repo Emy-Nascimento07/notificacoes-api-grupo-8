@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const { AccessDeniedError } = require("sequelize");
+const { AccessDeniedError, HostNotFoundError, ConnectionRefusedError } = require("sequelize");
 const app = require("./app");
 const sequelize = require('./config/database');
 
@@ -20,9 +20,13 @@ async function iniciar() {
     });
   } catch (erro) {
     if (erro instanceof AccessDeniedError) { // Se o erro identificado é igual ao erro de acesso negad
-      console.log('Acesso negado para o user root, revise a senha.');
+      console.log('❌Erro ao conectar com o banco de dados: Acesso negado para o user root, revise a senha.');
+    } else if (erro instanceof HostNotFoundError) {
+      console.log('❌Erro ao conectar com o banco de dados: Host não localizado.')
+    } else if (erro instanceof ConnectionRefusedError) {
+      console.log('❌Erro ao conectar com o banco de dados: Conexão recusada.');
     } else {
-      console.log('Erro ao conectar com o banco de dados:', erro.message);
+      console.log('❌Erro ao conectar com o banco de dados:', erro.message);
     }
     process.exit(1);
   }
