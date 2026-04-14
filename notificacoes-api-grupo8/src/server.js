@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const { AccessDeniedError, HostNotFoundError, ConnectionRefusedError } = require("sequelize");
 const app = require("./app");
-const sequelize = require('./config/database');
+const { sequelize } = require('./models');
 
 const PORT = process.env.PORT || 3000;
 
@@ -11,6 +11,10 @@ async function iniciar() {
     // Testar conexão com o banco
     await sequelize.authenticate();
     console.log('Conexão com o MySQL estabelecida com sucesso!✅');
+
+    // Sincronizar Models com o banco (criar tabelas se não existirem)
+    await sequelize.sync({ alter: true });
+    console.log('Tabelas sincronizadas com o banco de dados.')
 
     // Iniciar o servidor
     app.listen(PORT, () => {

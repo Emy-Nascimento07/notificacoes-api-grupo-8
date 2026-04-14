@@ -1,79 +1,47 @@
-// Banco de dados temporário - array em memória
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/database");
 
-let eventos = [
-    {
-        id: 1,
-        nome: "Workshop de Node.js",
-        descricao: "Aprenda Node.js do zero",
-        data: "2025-08-15",
-        local: "SENAI - Sala 3",
-        capacidade: 30,
+const Evento = sequelize.define(
+  "Evento",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
-    {
-        id: 2,
-        nome: "Hackathon SENAI 2025",
-        descricao: "Maratona de programação",
-        data: "2025-09-20",
-        local: "SENAI - Auditório",
-        capacidade: 100,
+    nome: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: "Nome não pode ser vazio" },
+        len: { args: [3, 255], msg: "Nome deve ter entre 3 e 255 caracteres" },
+      },
     },
-];
+    descricao: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    data: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    local: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    capacidade: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      validate: {
+        min: { args: [1], msg: "Capacidade deve ser pelo menos 1" },
+      },
+    },
+  },
+  {
+    tableName: "eventos",
+    timestamps: true, // cria createdAt e updatedAt automaticamente
+    underscored: true, 
+  },
+);
 
-// Variável para controlar o ID
-let proximoId = 3;
-
-// Listar os eventos
-function listarTodos() {
-    return eventos;
-}
-
-// Buscar evento pelo ID
-function buscarPorId(id) {
-    return eventos.find((evento) => evento.id === id);
-}
-
-// Criar novo evento
-function criar(dados) {
-    const novoEvento = {
-        id: proximoId,
-        nome: dados.nome,
-        descricao: dados.descricao,
-        data: dados.data,
-        local: dados.local,
-        capacidade: dados.capacidade,
-    };
-    proximoId++;
-    eventos.push(novoEvento);
-    return novoEvento;
-}
-
-// Atualizar evento existente
-function atualizar(id, dados) {
-    const index = eventos.findIndex((evento) => evento.id === id);
-    if (index === -1) return null;
-
-    eventos[index] = {
-        ...eventos[index], // Mantém os dados antigos
-        ...dados, // Sobreescreve com os novos
-        id: id, // Garante que o id não mude
-    };
-
-    return eventos[index];
-}
-
-// Deletar evento
-function deletar(id) {
-    const index = eventos.findIndex((evento) => evento.id === id);
-    if (index === -1) return false;
-
-    eventos.splice(index, 1);
-    return true;
-}
-
-module.exports = {
-    listarTodos,
-    buscarPorId,
-    criar,
-    atualizar,
-    deletar,
-};
+module.exports = Evento;
