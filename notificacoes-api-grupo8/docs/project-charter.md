@@ -28,12 +28,17 @@ Este módulo é necessário para enviar notificações automáticas, sendo integ
 - Envio de SMS ou push notifications
 
 
-## 5. Equipe
-| Nome | Função/Responsabilidade |
-|------|------------------------|
-| Emilly | Líder técnico, responsável pelo banco de dados |
-| Lívia | Responsável pela documentação |
-| Vinícius | Responsável pelos testes |
+## 5. Equipe e Matriz de Responsabilidades (RACI)
+
+| Atividade | Emilly | Lívia |Vinícius |
+|---|---|---|---|
+| Models/Migrations | R | R | R |
+| Controllers/Routes | R | R | R |
+| Services | R | R | R |
+| Documentação | C | R | C |
+| Testes Insomnia | R | A | I |
+| Deploy | C | C | R |
+**R** = Responsável | **A** = Aprovador | **C** = Consultado | **I** = Informado
 
 
 ## 6. Tecnologias
