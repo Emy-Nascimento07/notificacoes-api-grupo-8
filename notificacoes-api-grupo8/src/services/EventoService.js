@@ -1,82 +1,48 @@
-// Módulos internos do projeto
-const EventoModel = require("../models/EventoModel");
-const { NotFoundError, ValidationError } = require("../errors/AppError");
-const {
-    isRequired,
-    isPositiveInteger,
-    minLength,
-    validar,
-} = require("../helpers/validators");
+const { Evento } = require('../models');
+const { NotFoundError, ValidationError } = require('../errors/AppError');
 
-function listarTodos() {
-    return EventoModel.listarTodos();
+async function listarTodos() {
+  const eventos = await Evento.findAll({
+    order: [['data', 'ASC']],
+  });
+  return eventos;
 }
 
-function buscarPorId(id) {
-    const evento = EventoModel.buscarPorId(id);
-    
-    if (!evento) {
-        throw new NotFoundError("Evento");
-    }
+async function buscarPorId(id) {
+  const evento = await Evento.findByPk(id);
 
-    return evento;
+  if (!evento) {
+    throw new NotFoundError('Evento');
+  }
+
+  return evento;
 }
 
-function criar(dados) {
-    const { nome, descricao, data, local, capacidade } = dados;
-    
-    // Validação
-    const erros = validar([
-        isRequired(nome, "Nome"),
-        isRequired(data, "Data"),
-        minLength(nome, 3, "Nome"),
-        isPositiveInteger(capacidade, "Capacidade"),
-    ]);
-
-    if (erros) {
-        throw new ValidationError(erros.join("; "));
+async function criar(dados) {
+  try {
+    const novoEvento = await Evento.create(dados);
+    return novoEvento;
+  } catch (erro) {
+    // O Sequelize lança SequelizeValidationError para validações do Model
+    if (erro.name === 'SequelizeValidationError') {
+      const mensagens = erro.errors.map(e => e.message).join('; ');
+      throw new ValidationError(mensagens);
     }
-
-    return EventoModel.criar({ nome, descricao, data, local, capacidade });
+    throw erro;
+  }
 }
 
-function atualizar(id, dados) {
-    const { nome, capacidade } = dados;
-      
-    // Validações (campos opcionais no update)
-    const erros = validar([
-        minLength(nome, 3, "Nome"),
-        isPositiveInteger(capacidade, "Capacidade"),
-    ]);
-
-    if (erros) {
-        throw new ValidationError(erros.join("; "));
-    }
-
-    const eventoAtualizado = EventoModel.atualizar(id, dados);
-    if (!eventoAtualizado) {
-        throw new NotFoundError("Evento");
-    }
-
-    return eventoAtualizado;
+// Atualizar e Deletar vamos implementar na próxima aula
+async function atualizar(id, dados) {
+  // TODO: próxima aula
 }
 
-
-function deletar(id) {
-    const deletado = EventoModel.deletar(id);
-    
-    if (!deletado) {
-        throw new NotFoundError("Evento");
-    }
-
-    return true;
+async function deletar(id) {
+  // TODO: próxima aula
 }
-
 
 module.exports = {
-    listarTodos,
-    buscarPorId,
-    criar,
-    atualizar,
-    deletar,
+  listarTodos,
+  buscarPorId,
+  criar,
 };

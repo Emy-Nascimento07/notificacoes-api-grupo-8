@@ -6,9 +6,10 @@ const parseId = require("../helpers/parseId")
 
 
 // GET (buscar tudo) - Requisição refatorada, usando next, try e catch
-function index(req, res, next) {
+async function index(req, res, next) {
     try {
-        const participantes = ParticipanteService.listarTodos();
+        const participantes = await ParticipanteService.listarTodos();
+
         res.json(participantes);
     } catch (erro) {
         console.log(`Erro ao listar participantes: ${erro.message}`);
@@ -17,64 +18,46 @@ function index(req, res, next) {
 }
 
 // GET (buscar por ID) - Requisição refatorada, usando next, try e catch
-function show(req, res, next) {
-    try {
-        const id = parseId(req.params.id);
-        const participante = ParticipanteService.buscarPorId(id);
-        res.json(participante);
-    } catch (erro) {
-        console.log(`Erro ao buscar participante: ${erro.message}`);
-        next(erro)
-    }
+async function show(req, res, next) {
+  try {
+    const id = parseInt(req.params.id);
+
+    const participante = await ParticipanteService.buscarPorId(id);
+
+    res.json(participante);
+  } catch (erro) {
+    next(erro);
+  }
 }
 
 // POST (criar) - Requisição refatorada, usando next, try e catch
-function store(req, res, next) {
-    try {
-        const { nome, email } = req.body;
-        const novoParticipante = ParticipanteService.criar({
-        nome,
-        email,
-        });
+async function store(req, res, next) {
+  try {
+    const novoParticipante = await ParticipanteService.criar(req.body);
 
-        res.status(201).json(novoParticipante);
-    } catch (erro) {
-        console.log(`Erro ao criar participante: ${erro.message}`);
-        next(erro)
-    }
+    res.status(201).json(novoParticipante);
+  } catch (erro) {
+    next(erro);
+  }
 }
 
-// PUT (atualizar) - Requisição refatorada, usando next, try e catch
-function update(req, res, next) {
-    try {
-        const id = parseId(req.params.id);
-        const participanteAtualizado = ParticipanteService.atualizar(id, req.body);
-        res.json(participanteAtualizado);
-    } catch (erro) {
-        console.log(`Erro ao atualizar participante: ${erro.message}`);
-        next(erro)
-    }
+//Atualizar e Deletar vamos implementar na próxima aula
+
+async function atualizar(id, dados) {
+
+  // TODO: próxima aula
+
 }
 
+async function deletar(id) {
 
-// DELETE (deletar) - Requisição refatorada, usando next, try e catch
+  // TODO: próxima aula
 
-function destroy(req, res, next) {
-    try {
-        const id = parseId(req.params.id);
-        const deletado = ParticipanteService.deletar(id);
-        
-        res.status(204).send();
-    } catch (erro) {
-        console.log(`Erro ao deletar participante: ${erro.message}`);
-        next(erro)
-    }
 }
+
 
 module.exports = {
     index,
     show,
-    store,
-    update,
-    destroy,
+    store
 };

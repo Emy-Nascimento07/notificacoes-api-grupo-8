@@ -7,57 +7,51 @@ const {
     minLegth,
     validar,
 } = require('../helpers/validators');
+const Participante = require('../models/ParticipanteModel');
 
-function listarTodos(){
-    return ParticipanteModel.listarTodos();
-}
-
-function buscarPorId(id){
-    const participante = ParticipanteModel.buscarPorId(id);
-    if(!participante){
-        throw new NotFoundError('Participante não encontrado');
-    }
+async function listarTodos(){
+    
+    const participante = await Participante.findAll({
+     order: [['nome', 'ASC']]
+    });
     return participante;
 }
 
-function criar (dados) {
-    const {nome, email} = dados;
+async function buscarPorId(id){
+    const participante = await Participante.findByPk(id);
 
-    const erros = validar ([
-        isRequired(nome),
-        isRequired(email), 
-        isEmail(email),
-    ]);
+  if (!participante) {
+    throw new NotFoundError('Participante');
+  }
 
-    if(erros) throw new ValidationError(erros.join(";"));
-
-    return ParticipanteModel.criar({nome, email});
+  return participante;
 }
 
-function atualizar(id, dados) {
-    const participante = buscarPorId(id);
-    const {nome, email} = dados;
-
-    const erros = validar ([
-        isRequired(nome),
-        isRequired(email), 
-        isEmail(email),
-    ]);
-
-    if(erros) throw new ValidationError(erros.join(";"));
-
-    return ParticipanteModel.atualizar(id, {nome, email});
+async function criar(dados) {
+  try {
+    const novoParticipante = await Participante.create(dados);
+    return novoParticipante;
+  } catch (erro) {
+    // O Sequelize lança SequelizeValidationError para validações do Model
+    if (erro.name === 'SequelizeValidationError') {
+      const mensagens = erro.errors.map(e => e.message).join('; ');
+      throw new ValidationError(mensagens);
+    }
+    throw erro;
+  }
 }
 
-function deletar(id) {
-    const participante = buscarPorId(id);
-    return ParticipanteModel.deletar(id);
+// Atualizar e Deletar vamos implementar na próxima aula
+async function atualizar(id, dados) {
+  // TODO: próxima aula
 }
 
-module.exports = {
-    listarTodos,
-    buscarPorId,
-    criar,
-    atualizar,
-    deletar,
+async function deletar(id) {
+  // TODO: próxima aula
+}
+
+module.exports = { 
+    listarTodos, 
+    buscarPorId, 
+    criar
 };

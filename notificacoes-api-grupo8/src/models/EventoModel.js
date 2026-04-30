@@ -24,6 +24,10 @@ const Evento = sequelize.define(
     data: {
       type: DataTypes.DATE,
       allowNull: false,
+      validate: {
+        isNull: { msg: "Data não pode ser nula" },
+        isDate: { msg: "Data deve ser um formato de data válido" },
+      }
     },
     local: {
       type: DataTypes.STRING,
