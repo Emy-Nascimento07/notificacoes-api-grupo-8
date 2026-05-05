@@ -1,10 +1,21 @@
 const EventoService = require("../services/EventoService");
+const parseId = require("../helpers/parseId");
 
 async function index(req, res, next) {
   try {
-    const eventos = await EventoService.listarTodos();
+    const resultado = await EventoService.listarTodos({
+      pagina: req.query.pagina,
 
-    res.json(eventos);
+      porPagina: req.query.porPagina,
+
+      ordenarPor: req.query.ordenarPor,
+
+      ordem: req.query.ordem,
+
+      busca: req.query.busca,
+    });
+
+    res.json(resultado);
   } catch (erro) {
     next(erro);
   }
@@ -56,10 +67,21 @@ async function destroy(req, res, next) {
   }
 }
 
+async function futuros(req, res, next) {
+  try {
+    const eventosFuturos = await EventoService.listarFuturos(new Date());
+
+    res.json(eventosFuturos);
+  } catch (erro) {
+    next(erro);
+  }
+}
+
 module.exports = {
   index,
   show,
   store,
   update,
   destroy,
+  futuros
 };
