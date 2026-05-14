@@ -12,11 +12,11 @@
 - [Lista de cards concluídos com ✅]
 
 1. [ ✅ ] Levantamento de requisitos
-2. [ ✅ ] Dai
+2. [ ✅ ] Diagramas de Classes UML
 3. [ ✅ ] CRUD - Partcipantes
 4. [ ✅ ] CRUD - Inscrições
-5. [ ✅ ] CRUD - Eventoss
-6. [ ✅ ] Validações estão implementadascger
+5. [ ✅ ] CRUD - Eventos
+6. [ ✅ ] Validações estão implementadas
 7. [ ✅ ] Integração com o banco de dados
 8. [ ✅ ] Padrão MVC + Estrutura de Pastas
 9. [ ✅ ] Criação do banco de dados
@@ -24,7 +24,7 @@
 11. [ ✅ ] Tecnologias
 12. [ ✅ ] Clean Code
 13. [ ✅ ] Configuração do MySQL
-14. [ ✅ ] INscrições + Middlewares + Services
+14. [ ✅ ] Inscrições + Middlewares + Services
 15. [ ✅ ] Validações Base
 16. [ ✅ ] Criação do Board/Kanban
 17. [ ✅ ] Exportação JSON/XML
@@ -37,19 +37,20 @@
 3. Configuração do Nodemailer
 4. Desenvolvimento do Histórico de notificações
 5. Desenvolvimento do Envio de confirmação
-6. Apresentação do Projeto FinalADME
+6. Apresentação do Projeto Final
+7. Desenvolvimento do Envio de lembretes
 
 
 ## Métricas
 
-- Cards planejados: 30
-- Cards concluídos: 24
+- Cards planejados: 28
+- Cards concluídos: 35
 - Taxa de conclusão: 24/30 = 80%
 - Commits por membro: Emilly: 17, Lívia: 13, Vinícius: 10
 
 ## Impedimentos encontrados
 
-- Não houve impedimentos durante o desenvolvimento desse Sprint.
+- Não houveram impedimentos durante o desenvolvimento desse Sprint.
 
 ## Lições aprendidas
 

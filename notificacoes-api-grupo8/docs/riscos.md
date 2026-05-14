@@ -10,7 +10,7 @@
 | 6 | Vulnerabilidades de segurança (injeção SQL, auth) | Média | Alto | 🟠 | Code Review e validação cruzada
 | 7 | Problemas de performance/escalabilidade da API | Baixa | Médio | 🟡 | Fazer testes de queries no Insomnia
 | 8 | Falta de testes unitários/integração | Baixa | Alto | 🟡 | Implementar testes desde o início do projeto
-| 9 | Comunicação deficiente entre membros | Baixa | Médio | 🟡 | Trabalho em equipe e comunicação diária
+| 9 | Comunicação ineficiente entre membros | Baixa | Médio | 🟡 | Trabalho em equipe e comunicação diária
 | 10 | Base de dados crescer muito (performance) | Baixa | Médio | 🟡 | Limpeza de dados e priorizar o essencial
 | 11 | Falha na integração com sistema de notificações | Média | Alto | 🟠 | Testes cruzados
 | 12 | Mudanças de requisitos durante o projeto | Média | Médio | 🟠 | Validar requisitos com stakeholders na semana 1

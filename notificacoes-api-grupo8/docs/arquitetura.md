@@ -91,30 +91,43 @@ A estrutura do projeto é organizada em camadas, separando documentação, códi
 ```text
 notificacoes-api/
 ├── docs/
+│   ├── diagramas/
+│   │   ├── Diagrama.drawio
+│   │   └── Diagrama.drawio.png
+│   ├── prints-requisicoes/ 
+│   ├── projetos-insomnia/ 
+│   ├── sprint-reviews/ 
 │   ├── arquitetura.md
+│   ├── auditoria-qualidade.md
 │   ├── custos.md
 │   ├── definition-of-done.md
 │   ├── infraestrutura.md
+│   ├── pesquisa-mercado.md
 │   ├── project-charter.md
 │   ├── riscos.md
 │   ├── standup-log.md
-│   ├── wbs.md
-│   ├── diagramas/
-│   ├── prints-requisicoes/
-│   └── projetos-insomnia/
+│   ├── status-report.md
+│   └── wbs.md 
 ├── src/
 │   ├── config/
-│   │   └── database.js
+│   │   ├── cache.js
+│   │   ├── database.example.json
+│   │   ├── database.js
+│   │   └── upload.js
 │   ├── controllers/
 │   │   ├── EventoController.js
 │   │   ├── InscricaoController.js
 │   │   └── ParticipanteController.js
+│   ├── database/
+│   │   ├── migrations/
+│   │   └── seeders/
 │   ├── errors/
 │   │   └── AppError.js
 │   ├── helpers/
 │   │   ├── parseId.js
 │   │   └── validators.js
 │   ├── middlewares/
+│   │   ├── cacheMiddleware.js
 │   │   ├── errorHandler.js
 │   │   ├── logger.js
 │   │   ├── notFound.js
@@ -125,13 +138,10 @@ notificacoes-api/
 │   │   ├── NotificacaoModel.js
 │   │   ├── ParticipanteModel.js
 │   │   └── index.js
-│   ├── models-antigo/
-│   │   ├── EventoModel.js
-│   │   ├── InscricaoModel.js
-│   │   └── ParticipanteModel.js
 │   ├── routes/
 │   │   ├── eventoRoutes.js
 │   │   ├── inscricaoRoutes.js
+│   │   ├── exportRoutes.js
 │   │   └── participanteRoutes.js
 │   ├── services/
 │   │   ├── EventoService.js
@@ -140,6 +150,7 @@ notificacoes-api/
 │   ├── app.js
 │   ├── server.js
 │   └── swagger.js
+├── uploads/  
 ├── .env.example
 ├── .gitignore
 ├── package.json
