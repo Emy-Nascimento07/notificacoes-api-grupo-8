@@ -1,5 +1,6 @@
 const { Evento } = require('../models');
 const { NotFoundError, ValidationError } = require('../errors/AppError');
+const appEmitter = require('../events/eventEmitter');
 
 async function buscarPorId(id) {
   const evento = await Evento.findByPk(id);
@@ -12,13 +13,6 @@ async function buscarPorId(id) {
 async function criar(dados) {
   const { nome, descricao, data, local, capacidade, banner } = dados;
   try {
-  } catch (erro) {
-    // O Sequelize lança SequelizeValidationError para validações do Model
-    if (erro.name === 'SequelizeValidationError') {
-      const mensagens = erro.errors.map(e => e.message).join('; ');
-      throw new ValidationError(mensagens);
-    }
-    throw erro;
 
     const novoEvento = await Evento.create({
       nome: nome,
@@ -28,10 +22,17 @@ async function criar(dados) {
       capacidade: capacidade,
       banner: banner,
     });
-    return novoEvento;
 
     appEmitter.emit('evento:criado', novoEvento);
     return novoEvento;
+
+  } catch (erro) {
+    // O Sequelize lança SequelizeValidationError para validações do Model
+    if (erro.name === 'SequelizeValidationError') {
+      const mensagens = erro.errors.map(e => e.message).join('; ');
+      throw new ValidationError(mensagens);
+    }
+    throw erro;
   }
 }
 
@@ -67,8 +68,8 @@ async function deletar(id) {
 
   await evento.destroy();
 
-    appEmitter.emit('evento:deletado', evento);
-    return true;
+  appEmitter.emit('evento:deletado', evento);
+  return true;
 }
 
 async function listarTodos(opcoes = {}) {

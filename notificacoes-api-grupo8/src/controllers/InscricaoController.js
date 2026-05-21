@@ -4,11 +4,14 @@ const InscricaoService = require("../services/InscricaoService");
 
 async function store(req, res, next) {
   try {
-    const { evento_id, participante_id } = req.body;
-    const novaInscricao = await InscricaoService.criar({ evento_id, participante_id });
-    res.status(201).json(novaInscricao);
+    // 👇 Adicione esse log para ver se o Insomnia chega ao menos no Controller!
+    console.log("🎮 CHEGOU NO CONTROLLER! Dados do corpo:", req.body); 
+
+    const novaInscricao = await InscricaoService.criar(req.body);
+    return res.status(201).json(novaInscricao);
   } catch (erro) {
-    next(erro); 
+    console.error("❌ ERRO NO CONTROLLER:", erro.message);
+    next(erro); // Ou res.status(400).json({ erro: erro.message });
   }
 }
 

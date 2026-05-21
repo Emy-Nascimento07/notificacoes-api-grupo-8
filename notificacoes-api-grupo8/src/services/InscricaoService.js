@@ -2,10 +2,20 @@ const { Inscricao, Participante } = require('../models');
 const { NotFoundError, ValidationError } = require('../errors/AppError');
 const Evento = require('../models/EventoModel');
 const appEmitter = require('../events/eventEmitter');
+const app = require('../app');
 
-async function criar(dados) {
-    const { evento_id, participante_id } = dados;
+const InscricaoService = require('../services/InscricaoService'); 
+
+async function store(dados) {
+    console.log("🚀 MENSAGEM DO SERVICE: A função criar foi executada com os dados:", dados);
+
+    // 👇 SOLUÇÃO: Aceita tanto com underline quanto o padrão da apostila (camelCase)
+    const evento_id = dados.evento_id || dados.eventoId;
+    const participante_id = dados.participante_id || dados.participanteId;
     
+    // Logs de segurança para você ver no terminal se os IDs chegaram de verdade
+    console.log(`🔍 IDs extraídos -> Evento: ${evento_id}, Participante: ${participante_id}`);
+
     const evento = await Evento.findByPk(evento_id);
     if (!evento) throw new NotFoundError('Evento');
     
@@ -17,15 +27,18 @@ async function criar(dados) {
     });
     if (jaInscrito) throw new ValidationError('Participante já inscrito neste evento');
     
+    // Salva no banco de dados
     const novaInscricao = await Inscricao.create({
         evento_id: evento_id,
         participante_id: participante_id,
     });
 
-    // Emitir evento - Os observers serão notificados
+    // Emitir evento — Avisa tanto o logObserver quanto o notificacaoObserver
     appEmitter.emit('inscricao:criada', novaInscricao);
+    
     return novaInscricao;
 }
+
 
 async function listarTodas() {
     return await Inscricao.findAll({
@@ -75,6 +88,6 @@ module.exports = {
     listarTodas,
     listarPorEvento,
     buscarComDetalhes,
-    criar,
+    store,
     cancelar,
 };

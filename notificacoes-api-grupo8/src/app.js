@@ -1,72 +1,42 @@
-// Dependências externas do projeto
 const express = require("express");
 const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./swagger");
+const path = require('path');
 
-
+// 🚨 ATIVAÇÃO DOS OBSERVERS AQUI DENTRO!
+require('./events/notificacaoObserver');
+require('./events/logObserver');
 
 const app = express();
 
-// ============================================
-// MIDDLEWARES GLOBAIS
-// ============================================
+// Middlewares Globais
 app.use(express.json());
 app.use(cors());
 
-const responseTime = require("./middlewares/responseTime");
-app.use(responseTime);
-
-// ============================================
-// DOCUMENTAÇÃO
-// ============================================
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-// ============================================
-// ROTAS
-// ============================================
-// Módulos internos do projeto
+// Rotas principais do projeto
 const eventoRoutes = require("./routes/eventoRoutes");
 const participanteRoutes = require("./routes/participanteRoutes");
 const inscricaoRoutes = require("./routes/inscricaoRoutes");
 const exportRoutes = require('./routes/exportRoutes');
-const path = require('path');
-const notificacaoObserver = require('./events/notificacaoObserver');
-const notificacaoRoutes = require('../src/routes/notificacoesRoutes');
-
-
+const notificacaoRoutes = require('./routes/notificacaoRoutes');
 
 app.use("/eventos", eventoRoutes);
 app.use("/participantes", participanteRoutes);
 app.use("/inscricoes", inscricaoRoutes);
 app.use('/exportar', exportRoutes);
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 app.use('/notificacoes', notificacaoRoutes);
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
-// Rota raiz (informativa)
+// Rota informativa raiz
 app.get("/", (req, res) => {
-  res.json({
-    mensagem: "API de Notificações",
-    versao: "1.0.0",
-    documentacao: "/api-docs",
-    rotas: {
-      eventos: "/eventos",
-      participantes: "/participantes",
-      inscricoes: "/inscricoes",
-
-    },
-  });
+  res.json({ mensagem: "API de Notificações Ativa! 🚀" });
 });
 
-// ============================================
-// MIDDLEWARES DE ERRO (sempre por último!)
-// ============================================
+// Middlewares de erro (Sempre por último)
 const notFound = require("./middlewares/notFound");
 const errorHandler = require("./middlewares/errorHandler");
-
 app.use(notFound);
 app.use(errorHandler);
 
 module.exports = app;
-
-

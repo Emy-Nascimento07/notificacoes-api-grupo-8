@@ -1,29 +1,44 @@
-const fs = require("fs"); 
-const path = require("path");
-const appEmitter = require("./eventEmitter");
+const fs = require('fs');
+const path = require('path');
+const appEmitter = require('./eventEmitter'); 
 
-// Caminho direto para a pasta src/logs
-const logsDir = path.join(__dirname, '../logs');
-const logFilePath = path.join(logsDir, 'app.log');
+const caminhoLog = path.join(__dirname, '..', 'logs', 'app.log');
 
-function registrarLog(mensagem) {
+// --- LOGS DE INSCRIÇÃO ---
+appEmitter.on('inscricao:criada', (inscricao) => {
+    const linha = `[${new Date().toISOString()}] Inscrição #${inscricao.id} criada\n`;
     try {
-        // Garante a criação da pasta no momento da escrita, caso ela não exista
-        if (!fs.existsSync(logsDir)) {
-            fs.mkdirSync(logsDir, { recursive: true }); 
-        }
-        
-        const linha = `[${new Date().toISOString()}] ${mensagem}\n`;
-        
-        // Escreve de forma síncrona forçando a gravação física no disco
-        fs.appendFileSync(logFilePath, linha, 'utf8');
-        console.log(`[LOG-SISTEMA] Gravado com sucesso em: ${logFilePath}`);
-    } catch (erro) {
-        console.error("[LOG-SISTEMA] Erro crítico ao gravar arquivo:", erro.message);
+        fs.appendFileSync(caminhoLog, linha);
+        console.log(`✅ [LOG] Sucesso! Inscrição #${inscricao.id} gravada no app.log`);
+    } catch (err) {
+        console.error("Erro ao gravar log de criação:", err);
     }
-}
+});
 
-// Membro 1 : Escutar criação de inscrições
-appEmitter.on("inscricao:criada", (inscricao) => {
-    registrarLog(`Inscrição #${inscricao.id} criada`);
+appEmitter.on('inscricao:cancelada', (inscricao) => {
+    const linha = `[${new Date().toISOString()}] Inscrição #${inscricao.id} cancelada\n`;
+    try {
+        fs.appendFileSync(caminhoLog, linha);
+    } catch (err) {
+        console.error("Erro ao gravar log de inscrição cancelada:", err);
+    }
+});
+
+// --- LOGS DE EVENTO ---
+appEmitter.on('evento:criado', (evento) => {
+    const linha = `[${new Date().toISOString()}] Evento #${evento.id} ("${evento.nome}") criado\n`;
+    try {
+        fs.appendFileSync(caminhoLog, linha);
+    } catch (err) {
+        console.error("Erro ao gravar log de evento criado:", err);
+    }
+});
+
+appEmitter.on('evento:deletado', (evento) => {
+    const linha = `[${new Date().toISOString()}] Evento #${evento.id} ("${evento.nome}") deletado\n`;
+    try {
+        fs.appendFileSync(caminhoLog, linha);
+    } catch (err) {
+        console.error("Erro ao gravar log de evento deletado:", err);
+    }
 });
