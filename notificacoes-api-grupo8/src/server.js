@@ -18,10 +18,14 @@ async function iniciar() {
       console.log(`Servidor rodando em http://localhost:${PORT}`);
       console.log(`Documentação: http://localhost:${PORT}/api-docs`);
     });
+
   } catch (erro) {
     console.error('Erro ao iniciar:', erro.message);
     process.exit(1);
   }
+
 }
+
+
 
 iniciar();

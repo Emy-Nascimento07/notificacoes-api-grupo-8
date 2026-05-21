@@ -9,11 +9,9 @@ const InscricaoService = require('../services/InscricaoService');
 async function store(dados) {
     console.log("🚀 MENSAGEM DO SERVICE: A função criar foi executada com os dados:", dados);
 
-    // 👇 SOLUÇÃO: Aceita tanto com underline quanto o padrão da apostila (camelCase)
     const evento_id = dados.evento_id || dados.eventoId;
     const participante_id = dados.participante_id || dados.participanteId;
     
-    // Logs de segurança para você ver no terminal se os IDs chegaram de verdade
     console.log(`🔍 IDs extraídos -> Evento: ${evento_id}, Participante: ${participante_id}`);
 
     const evento = await Evento.findByPk(evento_id);

@@ -42,3 +42,14 @@ appEmitter.on('evento:deletado', (evento) => {
         console.error("Erro ao gravar log de evento deletado:", err);
     }
 });
+
+// LOGS DE PARTICIPANTE
+appEmitter.on('participante:criado', (participante) => {
+    const linha = `[${new Date().toISOString()}] Participante #${participante.id} registrado\n`;
+    try {
+        fs.appendFileSync(caminhoLog, linha);
+        console.log(`✅ [LOG] Sucesso! Participante #${participante.id} gravado no app.log`);
+    } catch (err) {
+        console.error("Erro ao gravar log de criação:", err);
+    }
+});

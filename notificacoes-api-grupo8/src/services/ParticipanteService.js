@@ -8,6 +8,8 @@ const {
     validar,
 } = require('../helpers/validators');
 const Participante = require('../models/ParticipanteModel');
+const appEmitter = require('../events/eventEmitter');
+
 
 async function listarTodos(){
     
@@ -30,7 +32,9 @@ async function buscarPorId(id){
 async function criar(dados) {
   try {
     const novoParticipante = await Participante.create(dados);
+    appEmitter.emit('participante:criado', novoParticipante);
     return novoParticipante;
+    
   } catch (erro) {
     // O Sequelize lança SequelizeValidationError para validações do Model
     if (erro.name === 'SequelizeValidationError') {
