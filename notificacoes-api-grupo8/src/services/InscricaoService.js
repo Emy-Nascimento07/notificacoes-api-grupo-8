@@ -62,7 +62,9 @@ async function cancelar(id) {
     const inscricao = await Inscricao.findByPk(id);
     if (!inscricao) throw new NotFoundError("Inscrição");
     
-    await inscricao.destroy();
+    await inscricao.update({ status: 'cancelada' });
+    
+    appEmitter.emit('inscricao:cancelada', inscricao);
     return true;
 }
 

@@ -1,97 +1,129 @@
 const appEmitter = require('./eventEmitter');
 const { Notificacao, Participante, Evento, Inscricao } = require('../models');
 const EmailService = require('../services/EmailService');
+const confirmacaoInscricao = require('../templates/email/confirmacaoInscricao');
+const cancelamentoInscricao = require('../templates/email/cancelamentoInscricao');
+const criacaoParticipante = require('../templates/email/criacaoParticipante');
+
+// Helper para ajudar a buscar dados completos da inscrição
+async function buscarDadosInscricao(inscricaoId) {
+  return await Inscricao.findByPk(inscricaoId, {
+    include: [
+      { model: Evento, as: 'evento' },
+      { model: Participante, as: 'participante' },
+    ],
+  });
+}
+
+// Helper para ajudar a buscar dados completos do participante
+async function buscarDadosParticipante(participante_id) {
+  return await Participante.findByPk(participante_id);
+}
+
+// Helper para salvar notificação no banco
+async function salvarNotificacao(dados) {
+  return await Notificacao.create(dados);
+}
 
 // OBSERVER DE INSCRIÇÃO CRIADA
 appEmitter.on('inscricao:criada', async (inscricao) => {
   try {
     console.log(`[OBSERVER] Nova inscrição detectada: #${inscricao.id}`);
-    const inscricaoCompleta = await Inscricao.findByPk(inscricao.id, {
-      include: [
-        { model: Evento, as: 'evento' },
-        { model: Participante, as: 'participante' },
-      ],
+    const dados = await buscarDadosInscricao(inscricao.id);
+
+    if (!dados) return;
+    const { evento, participante } = dados;
+
+    const assunto = `Inscrição confirmada: ${evento.nome}`;
+
+    const html = confirmacaoInscricao({
+      participanteNome: participante.nome,
+      eventoNome: evento.nome,
+      eventoData: evento.data,
+      eventoLocal: evento.local,
     });
 
-    if (!inscricaoCompleta) return;
-    const { evento, participante } = inscricaoCompleta;
+    const resultado = await EmailService.enviar(participante.email, assunto, html);
 
-    // Montar o HTML do e-mail
-
-    const html = `
-      <h2>Inscrição Confirmada! ✅</h2>
-      <p>Olá <strong>${participante.nome}</strong>,</p>
-      <p>Sua inscrição no evento <strong>"${evento.nome}"</strong> foi confirmada com sucesso.</p>
-      <p><strong>Detalhes do evento:</strong></p>
-      <ul>
-        <li><strong>Data:</strong> ${new Date(evento.data).toLocaleDateString('pt-BR')}</li>
-        <li><strong>Local:</strong> ${evento.local || 'A definir'}</li>
-      </ul>
-      <p>Até lá! 🎉</p>
-      <hr>
-      <small>Este é um e-mail automático da Plataforma de Eventos.</small>
-    `;
-
-    // Enviar o e-mail via MailPit
-
-    await EmailService.enviar(
-      participante.email,
-      `Inscrição confirmada: ${evento.nome}`,
-      html
-    );
-
-    // Salvar a notificação no banco com status "enviada"
-
-    await Notificacao.create({
+    await salvarNotificacao({
       inscricao_id: inscricao.id,
       tipo: 'confirmacao',
       destinatario_email: participante.email,
-      assunto: `Inscrição confirmada: ${evento.nome}`,
+      assunto,
       conteudo: html,
       data_envio: new Date(),
       enviada: true,
     });
+
     console.log(`[NOTIFICAÇÃO] Confirmação enviada para ${participante.email}`);
+    if (resultado?.visualizarEm) console.log(`   Visualizar em: ${resultado.visualizarEm}`);
   } catch (erro) {
-    console.error('[NOTIFICAÇÃO] Erro ao enviar:', erro.message);
+    console.error('[NOTIFICAÇÃO] Erro em inscricao:criada:', erro.message);
   }
 });
 
+// OBSERVER: INSCRIÇÃO CANCELADA
+appEmitter.on('inscricao:cancelada', async (inscricao) => {
+  try {
+    console.log(`[OBSERVER] Inscrição cancelada detectada: #${inscricao.id}`);
+    const dados = await buscarDadosInscricao(inscricao.id);
+    if (!dados) return;
+    const { evento, participante } = dados;
+    const assunto = `Inscrição cancelada: ${evento.nome}`;
+
+    const html = cancelamentoInscricao({
+      participanteNome: participante.nome,
+      eventoNome: evento.nome,
+    });
+
+    const resultado = await EmailService.enviar(participante.email, assunto, html);
+
+    await salvarNotificacao({
+      inscricao_id: inscricao.id,
+      tipo: 'cancelamento', 
+      destinatario_email: participante.email,
+      assunto,
+      conteudo: html,
+      data_envio: new Date(),
+      enviada: true,
+    });
+
+    console.log(`[NOTIFICAÇÃO] Cancelamento enviado para ${participante.email}`);
+    if (resultado?.visualizarEm) console.log(`   Visualizar em: ${resultado.visualizarEm}`);
+  } catch (erro) {
+    console.error('[NOTIFICAÇÃO] Erro em inscricao:cancelada:', erro.message);
+  }
+});
 
 // OBSERVAÇÃO DE PARTICIPANTE
 appEmitter.on('participante:criado', async (participante) => {
   try {
     console.log(`[OBSERVER] Novo participante detectado: #${participante.id}`);
 
-    // Montar o HTML do e-mail 
-    const html = `
-      <h2>Boas-vindas! ✅</h2>
-      <p>Bem-vindo à Plataforma de Eventos, <strong>${participante.nome}</strong>!</p>
-      <p>Agradecemos a preferência, aproveite! 🎉</p>
-      <hr>
-      <small>Este é um e-mail automático da Plataforma de Eventos.</small>
-    `;
+    const dadosParticipante = await buscarDadosParticipante(participante.id);
+    if (!dadosParticipante) return;
+    
+    const assunto = `Boas-vindas!🎉`;
 
-    // Enviar o e-mail via MailPit
-    await EmailService.enviar(
-      participante.email,
-      `Bem-vindo à Plataforma de Eventos, ${participante.nome}!`,
-      html
-    );
+    const html = criacaoParticipante({
+      participanteNome: dadosParticipante.nome,
+    });
 
-    // Salvar a notificação vinculada diretamente ao participante
-    await Notificacao.create({
-      participante_id: participante.id, 
+    const resultado = await EmailService.enviar(dadosParticipante.email, assunto, html);
+
+    await salvarNotificacao({
+      participante_id: dadosParticipante.id,
       tipo: 'welcome',
-      destinatario_email: participante.email,
-      assunto: `Boas-vindas!`,
+      destinatario_email: dadosParticipante.email,
+      assunto,
       conteudo: html,
       data_envio: new Date(),
       enviada: true,
     });
-    
-    console.log(`[NOTIFICAÇÃO] Boas-vindas enviada para ${participante.email}`);
+
+    console.log(`[NOTIFICAÇÃO] Boas-vindas enviada para ${dadosParticipante.email}`);
+    if (resultado?.visualizarEm) console.log(`   Visualizar em: ${resultado.visualizarEm}`);
   } catch (erro) {
-    console.error('[NOTIFICAÇÃO] Erro ao enviar:', erro.message);
+    console.error('[NOTIFICAÇÃO] Erro em participante:criado:', erro.message);
   }
 });
