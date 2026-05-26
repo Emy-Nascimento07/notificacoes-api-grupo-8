@@ -11,6 +11,8 @@ async function iniciar() {
     await sequelize.authenticate();
     console.log('Conexão com MySQL estabelecida com sucesso!');
 
+    await sequelize.sync({ alter: true });
+    console.log('Tabelas sincronizadas e atualizadas com sucesso!');
     // Inicializar o serviço de e-mail
     await EmailService.inicializar();
 

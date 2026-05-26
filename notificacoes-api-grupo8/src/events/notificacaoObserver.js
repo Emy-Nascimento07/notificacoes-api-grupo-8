@@ -15,7 +15,7 @@ async function buscarDadosInscricao(inscricaoId) {
 }
 
 async function buscarDadosParticipante(participante_id) {
-  return await Participante.findByPk(participante_id);
+  return await Participante.findByPk(participante_id, { raw: true });
 }
 
 async function salvarNotificacao(dados) {
@@ -59,8 +59,7 @@ appEmitter.on('inscricao:criada', async (inscricao) => {
     const resultado = await EmailService.enviar(participante.email, assunto, html);
 
     await salvarNotificacao({
-      inscricao_id: inscricao.id,
-      tipo: 'confirmacao',
+      tipo: 'welcome',
       destinatario_email: participante.email,
       assunto,
       conteudo: html,
@@ -124,6 +123,7 @@ appEmitter.on('participante:criado', async (participante) => {
     const resultado = await EmailService.enviar(dadosParticipante.email, assunto, html);
 
     await salvarNotificacao({
+      inscricao_id: null,
       participante_id: dadosParticipante.id,
       tipo: 'welcome',
       destinatario_email: dadosParticipante.email,

@@ -27,6 +27,7 @@ app.use("/inscricoes", inscricaoRoutes);
 app.use('/exportar', exportRoutes);
 app.use('/notificacoes', notificacaoRoutes);
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Rota informativa raiz
 app.get("/", (req, res) => {
